@@ -135,7 +135,6 @@ let main (argv: string array) =
     | None -> printfn "No source file specified"; 1
     | Some code_file ->
     
-    let mutable exit = false
 
     let ctx = 
         {
@@ -147,7 +146,6 @@ let main (argv: string array) =
                     Parser.parse(sr)
                 with err -> 
                     printfn "Failed to read file '%s'" code_file
-                    exit <- true
                     [||]
             CommandPosition = 0
             CellPositionX = 0
@@ -167,6 +165,8 @@ let main (argv: string array) =
                     x <- x + 1
                 y <- y + 1
         with err -> printfn "Failed to read file '%s'" data_file
+
+    let mutable exit = ctx.Commands.Length = 0
 
     let rec eval (command: Command) =
         match command with
