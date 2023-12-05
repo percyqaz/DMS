@@ -5,6 +5,14 @@
     | CommandPosition
     | CellPositionX
     | CellPositionY
+    override this.ToString() =
+        match this with
+        | K i -> i.ToString()
+        | Cell -> "."
+        | StackPosition -> "$"
+        | CommandPosition -> "%"
+        | CellPositionX -> "["
+        | CellPositionY -> "]"
 
 type Command =
     | Ex of Expression
@@ -22,6 +30,25 @@ type Command =
     | Output of Command
     | Discard of Command
     | Jump of Command
+    | Debug of Command
+    override this.ToString() =
+        match this with
+        | Ex ex -> ex.ToString()
+        | Neg inner -> sprintf "-%O" inner
+        | Sign inner -> sprintf "+%O" inner
+        | StackPush inner -> sprintf "/%O" inner
+        | StackRead inner -> sprintf "|%O" inner
+        | StackPop inner -> sprintf "\%O" inner
+        | Left inner -> sprintf "<%O" inner
+        | Right inner -> sprintf ">%O" inner
+        | Down inner -> sprintf "v%O" inner
+        | Up inner -> sprintf "^%O" inner
+        | Cond inner -> sprintf "?%O" inner
+        | Complement inner -> sprintf "!%O" inner
+        | Output inner -> sprintf "@%O" inner
+        | Discard inner -> sprintf "_%O" inner
+        | Jump inner -> sprintf ":%O" inner
+        | Debug inner -> sprintf ";%O" inner
 
 type Ctx =
     {
@@ -38,7 +65,7 @@ open System.Text
 
 module Parser =
 
-    let SYMBOLS = @"0123456789.'$%[]-+!/|\><v^?@_:" |> Seq.map int |> Set.ofSeq
+    let SYMBOLS = @"0123456789.'$%[]-+!/|\><v^?@_:;" |> Seq.map int |> Set.ofSeq
     let COMMENT = int '#'
 
     let number (sr: StreamReader) =
@@ -75,7 +102,9 @@ module Parser =
         | 64 -> sr.Read() |> fun _ -> command sr |> Output
         | 95 -> sr.Read() |> fun _ -> command sr |> Discard
         | 58 -> sr.Read() |> fun _ -> command sr |> Jump
-        | _ -> failwith "unreachable unless the SYMBOLS set is out of sync"
+        | 59 -> sr.Read() |> fun _ -> command sr |> Debug
+        | -1 -> failwith "Unexpected EOF"
+        | s -> failwithf "Unexpected character '%c' at position %i" (char s) sr.BaseStream.Position
 
     let parse (sr: StreamReader) : Command array = 
         seq {
@@ -145,7 +174,7 @@ let main (argv: string array) =
                     use sr = new StreamReader(fs, Encoding.UTF8)
                     Parser.parse(sr)
                 with err -> 
-                    printfn "Failed to read file '%s'" code_file
+                    printfn "Failed to read file '%s' (%s)" code_file err.Message
                     [||]
             CommandPosition = 0
             CellPositionX = 0
@@ -225,6 +254,10 @@ let main (argv: string array) =
         | Jump cmd -> 
             let x = eval cmd
             ctx.CommandPosition <- (ctx.CommandPosition + x) %% ctx.Commands.Length
+            x
+        | Debug cmd ->
+            let x = eval cmd
+            printfn "%O -> %i; [%i, %i] = %i; %%%A" cmd x ctx.CellPositionX ctx.CellPositionY ctx.Cells.[ctx.CellPositionX, ctx.CellPositionY] (List.ofSeq ctx.Stack)
             x
 
     while not exit do
