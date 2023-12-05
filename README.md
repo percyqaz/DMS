@@ -76,14 +76,14 @@ Outputting the NUL character (0) will terminate execution instead.
 This is the only way to terminate execution.
 In my implementation, outputting negative numbers also terminates execution, this is a bug.
 
-`:` will increment the command pointer by its argument, and then return it unchanged.
-If this jumps past the end of the program or before its beginning, the command pointer will wrap around, similar to cell positions and stack references.
+`:` will increment the command pointer by its argument, and then return it unchanged.  
+If this jumps past the end of the program or before its beginning, the command pointer will wrap around, similar to cell positions and stack references.  
 For example, `:-1` will enter an infinite loop because it will subtract 1 from the command pointer, then 1 will be added after it finishes executing, and the same command will be run again.  
 `:?1` will skip the command immediately following and increase the current cell by 1, if the current cell has a positive value.
 
 ### Other behaviours
 
-As mentioned in the description of `@`, attempting to output a NUL character (0) will terminate execution.
+As mentioned in the description of `@`, attempting to output a NUL character (0) will terminate execution.  
 Until this happens, the current command will be executed and then the command pointer will be incremented, wrapping back to the first command if the end of the program is reached.
 
 If a program consists of no commands, it will exit immediately.
@@ -106,11 +106,11 @@ Parsing should work by:
 - If you read a `#` during this state, discard everything until the next LF (this allows for comments)
 - Upon reading a command character, attempt to parse the command in full. EOF or unexpected/invalid characters should result in some parse error displayed (up to your implementation)  
   For example the file containing only `>` would not parse due to `>` being an operation with no operand on its right.  
-  `>#` would also not parse due to `#` not being a valid expression or operator.
-  After a successful parse of a command, return to the original state of ignoring any non-command characters
+  `>#` would also not parse due to `#` not being a valid expression or operator.  
+  After a successful parse of a command, return to the original state of ignoring any non-command characters.
 - Continue until EOF
 
 It is not ambiguous to have multiple commands on the same line in your source file:
 `_>3_<+5_^>>-+9` is 3 valid commands that will parse back to back
 
-You can separate your commands by any characters that doesn't make up part of a command or expression, or by using a # to have the parser ignore the rest of the line
+You can separate your commands by any characters that doesn't make up part of a command or expression (such as whitespace), or by using a # to have the parser ignore the rest of the line
