@@ -1,116 +1,54 @@
 # DMS
 Esoteric programming language built for Advent of Code 2023
 
-## Specification
+## Summary
 
-The DMS machine works only with 32-bit signed integers. There are no other types. All indices are 0-based.
-It consists of:
-- A 2D tape (with a finite size of your choosing) with the cell pointer starting at 0,0
-- A stack where numbers can be pushed or popped. Implementations can optionally have a maximum size, mine does not until OOM.
-- A command pointer, representing the current executing command
+For further details you should [read the full specification](https://github.com/percyqaz/DMS/blob/main/docs/spec.md), this is a simplified cheat sheet
 
-The memory tape is initialised to all 0s, but can be initialised to the contents of a text file, more on this below
+DMS code is broken up into commands, each command evaluates to an integer result, and can change the state of the machine. The resulting integer is added to the current cell.
 
-DMS code is broken up into commands, each command evaluates to a number and may have side effects that change the stack, memory tape and cursor position
+A command is either an **expression**, or a unary **operator** applied to another command. See below for details.
 
-A command is either an expression, or a unary operator applied to another command. Unary operators apply to what is on their right.
+## Expressions
 
-### Expressions
-Any sequence of base-10 digits i.e `31415` is an expression evaluating to the base-10 number written.  
-Implementations may optionally output a parser error when trying to enter a number too big for a signed 32-bit int, my implementation overflows while parsing instead.
+Are the simplest building block of commands, representing a single value
 
-`'` will express the character immediately following as a number, by converting it to its UTF-8 representation, for example `'a` is completely equivalent to `97`.  
-Used to conveniently enter constants for certain characters  
-My implementation currently performs a UTF-16 conversion, which is a bug
-  
-`.` evaluates to the value of the cell under the cell pointer
+| Symbol | Name | Returns | Notes |
+| ------ | ---- | ------- | ----- |
+| Any sequence of digits 0-9 | NUMBER | The base-10 interpretation of those digits as an integer i.e. `123` returns 123 | Up to implementation what to do if the number is too large for a 32-bit signed int. F# implementation overflows
+| `'` followed by any character C | CHAR | The UTF-8 value of the character C as an int, i.e `'a` returns 97 | F# implementation is bugged, wrong conversion in certain character ranges
+| `.` | CELL | Value stored in the current cell
+| `%` | COMMAND_POINTER | The command pointer
+| `[` | CELL_POSITION_X | The X coordinate of the cell pointer |
+| `]` | CELL_POSITION_Y | The Y coordinate of the cell pointer |
 
-`%` evaluates to the value of the command pointer, for example if this is the second command in the program, this will be `1`.
+## Operators
 
-`[` evaluates to the x coordinate of the cell pointer, initially 0.
+Let **I** denote the input to each operator for the descriptions of effects and return values.
 
-`]` evaluates to the y coordinate of the cell pointer, initially 0.
+| Symbol | Name | Effect | Returns | Notes |
+| ------ | ---- | ------ | ------- | ----- |
+| `-` | NEGATE | No effect on state | -I | `-123` is `-` applied to `123`, returning -123
+| `+` | SIGN | No effect on state | The sign of I -- 1 if  I is positive, -1 if I is negative, 0 otherwise
+| `!` | COMPLEMENT | No effect on state | 1 - I | `!1` returns 0, `!0` returns 1, `!6` returns -5
+| `?` | COMPARE | No effect on state | I if the current cell value is positive. 0 otherwise
+| `_` | DISCARD | No effect on state | Always returns 0, ignoring its input | Useful for creating a command that updates the state of the machine but doesn't write anything to the current cell.
+| `@` | CHAR_OUTPUT | Writes I, interpreted as a UTF-8 character, to standard output. If I is 0, terminates the program instead | I (unchanged) | Outputting the NUL char (0) is the only way to terminate a DMS program
+| `*` | INT_OUTPUT | Writes I, formatted as a base-10 integer, to standard output. | I (unchanged)
+| `:` | JUMP | Increases the command pointer by I | I (unchanged) | Jumping past the last command or before the first causes the command pointer to wrap around. Jumping by -1 (`:-1`) will result in the same command being executed in a loop.
+| `<` | LEFT | Decreases cell pointer's X value by I | I (unchanged) | This moves the current cell left by I. Cell positions wrap at the edges of the tape
+| `>` | RIGHT | Increases cell pointer's X value by I | I (unchanged) | This moves the current cell right by I. Cell positions wrap at the edges of the tape
+| `^` | UP | Decreases cell pointer's Y value by I | I (unchanged) | This moves the current cell up by I. Cell positions wrap at the edges of the tape
+| `v` | DOWN | Increases cell pointer's Y value by I | I (unchanged) | This moves the current cell down by I. Cell positions wrap at the edges of the tape
+| `/` | PUSH | Pushes I to the top of the stack | The new stack size
+| `\|` | READ | No effect on state | Returns the value on the stack I positions deep. If the stack is empty, returns the current cell value instead | `\|0` returns the topmost stack element. Stack positions wrap around, so `\|-1` returns the bottom element of the stack.
+| `\` | POP | Removes the value on the stack I positions deep. If the stack is empty, there is no effect. | Returns the removed value. If the stack is empty, returns the current cell value instead | `\0` removes and returns the topmost stack element. Stack positions  wrap around, so `\-1` removes and returns the bottom element of the stack.
+| `;` | DEBUG | Writes debug information about the current state to standard output. No other effect on state | I (unchanged) | What is output is up to the implementation. F# implementation outputs value of various state variables, the command fragment passed as an argument, and then waits for `Console.ReadLine()` before proceeding
 
-### Commands
-The **current cell** refers to the cell in the 2D tape that the cell pointer is over
+So the command `<:?\0`:
+- Pops the top value from the stack (or returns the cell value if the stack is empty)
+- Jumps ahead by that many commands IF the current cell value is positive, else 0
+- Move the cell pointer to the left by the amount of commands jumped over
+- Returns the amount of commands jumped over
 
-Commands apply to their right operand, and can be chained
-The final value of the command is added to the current cell. No overflow checking should be implemented.
-
-`-` negates its argument, hence the full command `-17` would subtract 17 from the current cell.
-
-`+` returns the 'sign' of its argument - this is -1 if the argument was negative, 1 if positive, 0 if 0. `+-17` would subtract 1 from the current cell.
-
-`!` returns the 'complement' of its argument - this is 1 - the argument. `!!0` evaluates to 0. `!2` evaluates to -1.
-
-`/` pushes its argument to the stack, and returns the new count of items currently on the stack.
-
-`|` reads the stack at the position described by its argument, and returns that value.  
-The argument should wrap around if too small or too big, for example if the top of the stack is 0 and the bottom is 1, `|-1` will return 1.  
-If the stack is empty this should return the current cell value instead.
-
-`\` pops the value from the stack at the position described by its argument, and returns that value.  
-Same wrapping behaviour as `|`  
-If the stack is empty this should return the current cell value instead.
-
-`<` moves the cell pointer left N steps, where N is its argument. It then returns N, unchanged.  
-If this moves the cell pointer out of bounds, it should wrap, so if the lowest available cell coordinate was -1 and the highest was 10, moving 5 left from position 0 will put you at 7.
-
-`>` moves the cell pointer right N steps, where N is its argument. It then returns N, unchanged.  
-Same wrapping behaviour same as `<`
-
-`^` moves the cell pointer up N steps, where N is its argument. It then returns N, unchanged.  
-Same wrapping behaviour same as `<`
-
-`v` moves the cell pointer down N steps, where N is its argument. It then returns N, unchanged.  
-Same wrapping behaviour same as `<`  
-For example, `v+<5` would move the cell pointer 5 cells to the left, then one cell down, and then increment the cell at this new position by 1
-
-`?` will replace its argument with 0 if the current cell value is not positive. If it is positive, it returns it unchanged.
-
-`_` will replace its argument with 0.  
-Useful for running a command that updates the state of the machine but doesn't write anything to the current cell.
-
-`@` will output its argument to the console, as a UTF-8 character.  
-Outputting the NUL character (0) will terminate execution instead.  
-This is the only way to terminate execution.
-In my implementation, outputting negative numbers also terminates execution, this is a bug.
-
-`:` will increment the command pointer by its argument, and then return it unchanged.  
-If this jumps past the end of the program or before its beginning, the command pointer will wrap around, similar to cell positions and stack references.  
-For example, `:-1` will enter an infinite loop because it will subtract 1 from the command pointer, then 1 will be added after it finishes executing, and the same command will be run again.  
-`:?1` will skip the command immediately following and increase the current cell by 1, if the current cell has a positive value.
-
-### Other behaviours
-
-As mentioned in the description of `@`, attempting to output a NUL character (0) will terminate execution.  
-Until this happens, the current command will be executed and then the command pointer will be incremented, wrapping back to the first command if the end of the program is reached.
-
-If a program consists of no commands, it will exit immediately.
-
-#### Initialising the tape
-
-Interpreter implementations can optionally support requests for a maximum tape size - My implementation allows you to provide the bounds as a range, including allowing negative coordinates
-
-Interpreter implementations should support a method for using a UTF-8 encoded text file to populate the memory cells.  
-A chosen file should be read line by line - a line ends with (and does not include) either CRLF or LF.  
-Each line is then inserted as a row of characters converted to signed 32-bit integers into the tape, starting at (0,0) for the first line of the file, (0,1) for the second, etc.  
-The rest of the tape remains initialised to 0.
-
-How you handle cases where the requested file exceeds the tape width or height is up to you - I suggest wrapping around :)
-
-#### Parsing
-
-Parsing should work by:
-- Ignoring any character that cannot be part of a command until you see one that does
-- If you read a `#` during this state, discard everything until the next LF (this allows for comments)
-- Upon reading a command character, attempt to parse the command in full. EOF or unexpected/invalid characters should result in some parse error displayed (up to your implementation)  
-  For example the file containing only `>` would not parse due to `>` being an operation with no operand on its right.  
-  `>#` would also not parse due to `#` not being a valid expression or operator.  
-  After a successful parse of a command, return to the original state of ignoring any non-command characters.
-- Continue until EOF
-
-It is not ambiguous to have multiple commands on the same line in your source file:
-`_>3_<+5_^>>-+9` is 3 valid commands that will parse back to back
-
-You can separate your commands by any characters that doesn't make up part of a command or expression (such as whitespace), or by using a # to have the parser ignore the rest of the line
+After executing the command, that returned number is added to the cell that the cell pointer is now pointing to.

@@ -27,7 +27,8 @@ type Command =
     | Up of Command
     | Cond of Command
     | Complement of Command
-    | Output of Command
+    | WriteChar of Command
+    | WriteNumber of Command
     | Discard of Command
     | Jump of Command
     | Debug of Command
@@ -45,7 +46,8 @@ type Command =
         | Up inner -> sprintf "^%O" inner
         | Cond inner -> sprintf "?%O" inner
         | Complement inner -> sprintf "!%O" inner
-        | Output inner -> sprintf "@%O" inner
+        | WriteChar inner -> sprintf "@%O" inner
+        | WriteNumber inner -> sprintf "*%O" inner
         | Discard inner -> sprintf "_%O" inner
         | Jump inner -> sprintf ":%O" inner
         | Debug inner -> sprintf ";%O" inner
@@ -65,7 +67,7 @@ open System.Text
 
 module Parser =
 
-    let SYMBOLS = @"0123456789.'$%[]-+!/|\><v^?@_:;" |> Seq.map int |> Set.ofSeq
+    let SYMBOLS = @"0123456789.'$%[]-+!/|\><v^?@*_:;" |> Seq.map int |> Set.ofSeq
     let COMMENT = int '#'
 
     let number (sr: StreamReader) =
@@ -99,7 +101,8 @@ module Parser =
         | 118 -> sr.Read() |> fun _ -> command sr |> Down
         | 94 -> sr.Read() |> fun _ -> command sr |> Up
         | 63 -> sr.Read() |> fun _ -> command sr |> Cond
-        | 64 -> sr.Read() |> fun _ -> command sr |> Output
+        | 64 -> sr.Read() |> fun _ -> command sr |> WriteChar
+        | 42 -> sr.Read() |> fun _ -> command sr |> WriteNumber
         | 95 -> sr.Read() |> fun _ -> command sr |> Discard
         | 58 -> sr.Read() |> fun _ -> command sr |> Jump
         | 59 -> sr.Read() |> fun _ -> command sr |> Debug
@@ -246,9 +249,13 @@ let main (argv: string array) =
             let x = eval cmd
             if ctx.Cells.[ctx.CellPositionX, ctx.CellPositionY] > 0 then x else 0
         | Complement cmd -> 1 - eval cmd
-        | Output cmd ->
+        | WriteChar cmd ->
             let x = eval cmd
             if x > 0 then printf "%c" (char x) else exit <- true
+            x
+        | WriteNumber cmd ->
+            let x = eval cmd
+            printf "%i" x
             x
         | Discard cmd -> eval cmd |> fun _ -> 0
         | Jump cmd -> 
@@ -256,8 +263,17 @@ let main (argv: string array) =
             ctx.CommandPosition <- (ctx.CommandPosition + x) %% ctx.Commands.Length
             x
         | Debug cmd ->
+            let fmt_int i = if i > 32 && i < 128 then sprintf "%i (%c)" i (char i) else sprintf "%i" i
             let x = eval cmd
-            printfn "%O -> %i; [%i, %i] = %i; %%%A" cmd x ctx.CellPositionX ctx.CellPositionY ctx.Cells.[ctx.CellPositionX, ctx.CellPositionY] (List.ofSeq ctx.Stack)
+            printfn 
+                "BREAKPOINT INFORMATION\nCommand %O evaluated to %s\nYou are at [%i, %i] (%s)\nStack top -> bottom: %s"
+                cmd
+                (fmt_int x)
+                ctx.CellPositionX
+                ctx.CellPositionY
+                (fmt_int ctx.Cells.[ctx.CellPositionX, ctx.CellPositionY])
+                (List.ofSeq ctx.Stack |> List.map fmt_int |> String.concat "  ")
+            System.Console.ReadLine() |> ignore
             x
 
     while not exit do
