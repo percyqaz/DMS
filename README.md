@@ -31,7 +31,7 @@ Let **I** denote the input to each operator for the descriptions of effects and 
 | `-` | NEGATE | No effect on state | -I | `-123` is `-` applied to `123`, returning -123
 | `+` | SIGN | No effect on state | The sign of I -- 1 if  I is positive, -1 if I is negative, 0 otherwise
 | `!` | COMPLEMENT | No effect on state | 1 - I | `!1` returns 0, `!0` returns 1, `!6` returns -5
-| `?` | COMPARE | No effect on state | I if the current cell value is positive. 0 otherwise
+| `?` | CONDITION | No effect on state | I if the current cell value is positive. 0 otherwise
 | `_` | DISCARD | No effect on state | Always returns 0, ignoring its input | Useful for creating a command that updates the state of the machine but doesn't write anything to the current cell.
 | `@` | CHAR_OUTPUT | Writes I, interpreted as a UTF-8 character, to standard output. If I is 0, terminates the program instead | I (unchanged) | Outputting the NUL char (0) is the only way to terminate a DMS program
 | `*` | INT_OUTPUT | Writes I, formatted as a base-10 integer, to standard output. | I (unchanged)

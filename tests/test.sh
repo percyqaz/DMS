@@ -1,1 +1,1 @@
-../bin/Debug/net8.0/DMS.exe --data program.dms program.dms
+../src/bin/Debug/net8.0/DMS.exe --data program.dms program.dms
