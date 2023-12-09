@@ -3,7 +3,8 @@ Esoteric programming language built for Advent of Code 2023
 
 ## Summary
 
-For further details you should [read the full specification](https://github.com/percyqaz/DMS/blob/main/docs/spec.md), this is a simplified cheat sheet
+> [!NOTE]
+> For full details you should [read the full specification](https://github.com/percyqaz/DMS/blob/main/docs/spec.md), this is a simplified cheat sheet
 
 DMS code is broken up into commands, each command evaluates to an integer result, and can change the state of the machine. The resulting integer is added to the current cell.
 
