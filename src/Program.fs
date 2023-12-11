@@ -59,7 +59,7 @@ type Ctx =
         mutable CellPositionY: int
         Cells: int[,]
     }
-
+    
 open System.IO
 open System.Text
 
