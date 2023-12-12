@@ -16,8 +16,8 @@ Are the simplest building block of commands, representing a single value
 
 | Symbol | Name | Returns | Notes |
 | ------ | ---- | ------- | ----- |
-| Any sequence of digits 0-9 | NUMBER | The base-10 interpretation of those digits as an integer i.e. `123` returns 123 | Up to implementation what to do if the number is too large for a 32-bit signed int. F# implementation overflows
-| `'` followed by any character C | CHAR | The UTF-8 value of the character C as an int, i.e `'a` returns 97 | F# implementation is bugged, wrong conversion in certain character ranges
+| Any sequence of digits 0-9 | NUMBER | The base-10 interpretation of those digits as an integer i.e. `123` returns 123 | Up to implementation what to do if the number is too large for a 32-bit signed int
+| `'` followed by any character C | CHAR | The UTF-8 value of the character C as an int, i.e `'a` returns 97 | Implementations don't perfectly line up with spec
 | `.` | CELL | Value stored in the current cell
 | `%` | COMMAND_POINTER | The command pointer
 | `[` | CELL_POSITION_X | The X coordinate of the cell pointer |
