@@ -358,6 +358,6 @@ function load_example_2() {
 }
 
 function load_example_3() {
-	document.getElementById("source").value = "I don't exist yet";
+	document.getElementById("source").value = "I don't exist yet!@0";
 	document.getElementById("data").value = "I don't exist yet";
 }
