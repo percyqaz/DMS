@@ -2,25 +2,266 @@
 <html lang="en">
 <meta charset="UTF-8">
 <title>DMS Fiddle</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="">
-<style>
-</style>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet"/>
+<link href="style.css" rel="stylesheet">
 <script src="index.js"></script>
 <body>
 
 <div>
-	<h1>DMS</h1>
-	<p>This is an esoteric programming language that was built for Advent of Code puzzles</p>
-	<p>Read more about this <a href="https://github.com/percyqaz/DMS">here</a></p>
-	<label>Source code</label>
-	<textarea id="source" rows="20">Source code</textarea>
-	<label>Input data</label>
-	<textarea id="data" rows="20">Hello, World!</textarea>
-	<button onclick="run()">Run</button>
-	<label>Output</label>
-	<textarea id="output" rows="20"></textarea>
+	<div class="container mx-auto mt-4">
+		<div class="flex flex-row justify-between items-center mb-4">
+			<div class="flex flex-col">
+				<h1 class="text-4xl hover:underline"><a href="https://www.youtube.com/watch?v=tZRJ_tffqc4">DMS</a></h1>
+				<p class="text-gray-700 italic text-sm">YOU DON'T MAKE SENSE</p>
+			</div>
+			<div class="flex flex-row gap-x-6">
+				<div class="flex flex-row gap-x-2 items-center hover:underline" onclick="load_example_1()">
+					<svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M23 4C23 3.11596 21.855 2.80151 21.0975 2.59348C21.0279 2.57437 20.9616 2.55615 20.8997 2.53848C19.9537 2.26818 18.6102 2 17 2C15.2762 2 13.8549 2.574 12.8789 3.13176C12.7296 3.21707 12.5726 3.33492 12.4307 3.44143C12.2433 3.58215 12.0823 3.70308 12 3.70308C11.9177 3.70308 11.7567 3.58215 11.5693 3.44143C11.4274 3.33492 11.2704 3.21707 11.1211 3.13176C10.1451 2.574 8.72378 2 7 2C5.38978 2 4.0463 2.26818 3.10028 2.53848C3.04079 2.55547 2.97705 2.57302 2.91016 2.59144C2.156 2.79911 1 3.11742 1 4V17C1 17.3466 1.17945 17.6684 1.47427 17.8507C1.94329 18.1405 2.56224 17.8868 3.11074 17.662C3.30209 17.5835 3.48487 17.5086 3.64972 17.4615C4.4537 17.2318 5.61022 17 7 17C8.2613 17 9.20554 17.4161 9.9134 17.8517C10.0952 17.9636 10.279 18.1063 10.4676 18.2527C10.9338 18.6148 11.4298 19 12 19C12.5718 19 13.0653 18.6162 13.5307 18.2543C13.7195 18.1074 13.9037 17.9642 14.0866 17.8517C14.7945 17.4161 15.7387 17 17 17C18.3898 17 19.5463 17.2318 20.3503 17.4615C20.5227 17.5108 20.7099 17.5898 20.9042 17.6719C21.4443 17.9 22.0393 18.1513 22.5257 17.8507C22.8205 17.6684 23 17.3466 23 17V4ZM3.33252 4.55749C3.13163 4.62161 3 4.81078 3 5.02166V14.8991C3 15.233 3.32089 15.4733 3.64547 15.3951C4.53577 15.1807 5.67777 15 7 15C8.76309 15 10.0794 15.5994 11 16.1721V5.45567C10.7989 5.29593 10.5037 5.08245 10.1289 4.86824C9.35493 4.426 8.27622 4 7 4C5.41509 4 4.12989 4.30297 3.33252 4.55749ZM17 15C15.2369 15 13.9206 15.5994 13 16.1721V5.45567C13.2011 5.29593 13.4963 5.08245 13.8711 4.86824C14.6451 4.426 15.7238 4 17 4C18.5849 4 19.8701 4.30297 20.6675 4.55749C20.8684 4.62161 21 4.81078 21 5.02166V14.8991C21 15.233 20.6791 15.4733 20.3545 15.3951C19.4642 15.1807 18.3222 15 17 15Z" fill="#0F0F0F"/>
+						<path d="M2.08735 20.4087C1.86161 19.9047 2.08723 19.3131 2.59127 19.0873C3.05951 18.8792 3.54426 18.7043 4.0318 18.5478C4.84068 18.2883 5.95911 18 7 18C8.16689 18 9.16285 18.6289 9.88469 19.0847C9.92174 19.1081 9.95807 19.131 9.99366 19.1534C10.8347 19.6821 11.4004 20 12 20C12.5989 20 13.1612 19.6829 14.0012 19.1538C14.0357 19.1321 14.0708 19.1099 14.1066 19.0872C14.8291 18.6303 15.8257 18 17 18C18.0465 18 19.1647 18.2881 19.9732 18.548C20.6992 18.7814 21.2378 19.0122 21.3762 19.073C21.8822 19.2968 22.1443 19.8943 21.9118 20.4105C21.6867 20.9106 21.0859 21.1325 20.5874 20.9109C20.1883 20.7349 19.7761 20.5855 19.361 20.452C18.6142 20.2119 17.7324 20 17 20C16.4409 20 15.9037 20.3186 15.0069 20.8841C14.2635 21.3529 13.2373 22 12 22C10.7619 22 9.73236 21.3521 8.98685 20.8829C8.08824 20.3173 7.55225 20 7 20C6.27378 20 5.39222 20.2117 4.64287 20.4522C4.22538 20.5861 3.80974 20.7351 3.4085 20.9128C2.9045 21.1383 2.31305 20.9127 2.08735 20.4087Z" fill="#0F0F0F"/>
+					</svg>
+					Load example 1
+				</div>
+				<div class="flex flex-row gap-x-2 items-center hover:underline" onclick="load_example_2()">
+					<svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M23 4C23 3.11596 21.855 2.80151 21.0975 2.59348C21.0279 2.57437 20.9616 2.55615 20.8997 2.53848C19.9537 2.26818 18.6102 2 17 2C15.2762 2 13.8549 2.574 12.8789 3.13176C12.7296 3.21707 12.5726 3.33492 12.4307 3.44143C12.2433 3.58215 12.0823 3.70308 12 3.70308C11.9177 3.70308 11.7567 3.58215 11.5693 3.44143C11.4274 3.33492 11.2704 3.21707 11.1211 3.13176C10.1451 2.574 8.72378 2 7 2C5.38978 2 4.0463 2.26818 3.10028 2.53848C3.04079 2.55547 2.97705 2.57302 2.91016 2.59144C2.156 2.79911 1 3.11742 1 4V17C1 17.3466 1.17945 17.6684 1.47427 17.8507C1.94329 18.1405 2.56224 17.8868 3.11074 17.662C3.30209 17.5835 3.48487 17.5086 3.64972 17.4615C4.4537 17.2318 5.61022 17 7 17C8.2613 17 9.20554 17.4161 9.9134 17.8517C10.0952 17.9636 10.279 18.1063 10.4676 18.2527C10.9338 18.6148 11.4298 19 12 19C12.5718 19 13.0653 18.6162 13.5307 18.2543C13.7195 18.1074 13.9037 17.9642 14.0866 17.8517C14.7945 17.4161 15.7387 17 17 17C18.3898 17 19.5463 17.2318 20.3503 17.4615C20.5227 17.5108 20.7099 17.5898 20.9042 17.6719C21.4443 17.9 22.0393 18.1513 22.5257 17.8507C22.8205 17.6684 23 17.3466 23 17V4ZM3.33252 4.55749C3.13163 4.62161 3 4.81078 3 5.02166V14.8991C3 15.233 3.32089 15.4733 3.64547 15.3951C4.53577 15.1807 5.67777 15 7 15C8.76309 15 10.0794 15.5994 11 16.1721V5.45567C10.7989 5.29593 10.5037 5.08245 10.1289 4.86824C9.35493 4.426 8.27622 4 7 4C5.41509 4 4.12989 4.30297 3.33252 4.55749ZM17 15C15.2369 15 13.9206 15.5994 13 16.1721V5.45567C13.2011 5.29593 13.4963 5.08245 13.8711 4.86824C14.6451 4.426 15.7238 4 17 4C18.5849 4 19.8701 4.30297 20.6675 4.55749C20.8684 4.62161 21 4.81078 21 5.02166V14.8991C21 15.233 20.6791 15.4733 20.3545 15.3951C19.4642 15.1807 18.3222 15 17 15Z" fill="#0F0F0F"/>
+						<path d="M2.08735 20.4087C1.86161 19.9047 2.08723 19.3131 2.59127 19.0873C3.05951 18.8792 3.54426 18.7043 4.0318 18.5478C4.84068 18.2883 5.95911 18 7 18C8.16689 18 9.16285 18.6289 9.88469 19.0847C9.92174 19.1081 9.95807 19.131 9.99366 19.1534C10.8347 19.6821 11.4004 20 12 20C12.5989 20 13.1612 19.6829 14.0012 19.1538C14.0357 19.1321 14.0708 19.1099 14.1066 19.0872C14.8291 18.6303 15.8257 18 17 18C18.0465 18 19.1647 18.2881 19.9732 18.548C20.6992 18.7814 21.2378 19.0122 21.3762 19.073C21.8822 19.2968 22.1443 19.8943 21.9118 20.4105C21.6867 20.9106 21.0859 21.1325 20.5874 20.9109C20.1883 20.7349 19.7761 20.5855 19.361 20.452C18.6142 20.2119 17.7324 20 17 20C16.4409 20 15.9037 20.3186 15.0069 20.8841C14.2635 21.3529 13.2373 22 12 22C10.7619 22 9.73236 21.3521 8.98685 20.8829C8.08824 20.3173 7.55225 20 7 20C6.27378 20 5.39222 20.2117 4.64287 20.4522C4.22538 20.5861 3.80974 20.7351 3.4085 20.9128C2.9045 21.1383 2.31305 20.9127 2.08735 20.4087Z" fill="#0F0F0F"/>
+					</svg>
+					Load example 2
+				</div>
+				<div class="flex flex-row gap-x-2 items-center hover:underline" onclick="load_example_3()">
+					<svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M23 4C23 3.11596 21.855 2.80151 21.0975 2.59348C21.0279 2.57437 20.9616 2.55615 20.8997 2.53848C19.9537 2.26818 18.6102 2 17 2C15.2762 2 13.8549 2.574 12.8789 3.13176C12.7296 3.21707 12.5726 3.33492 12.4307 3.44143C12.2433 3.58215 12.0823 3.70308 12 3.70308C11.9177 3.70308 11.7567 3.58215 11.5693 3.44143C11.4274 3.33492 11.2704 3.21707 11.1211 3.13176C10.1451 2.574 8.72378 2 7 2C5.38978 2 4.0463 2.26818 3.10028 2.53848C3.04079 2.55547 2.97705 2.57302 2.91016 2.59144C2.156 2.79911 1 3.11742 1 4V17C1 17.3466 1.17945 17.6684 1.47427 17.8507C1.94329 18.1405 2.56224 17.8868 3.11074 17.662C3.30209 17.5835 3.48487 17.5086 3.64972 17.4615C4.4537 17.2318 5.61022 17 7 17C8.2613 17 9.20554 17.4161 9.9134 17.8517C10.0952 17.9636 10.279 18.1063 10.4676 18.2527C10.9338 18.6148 11.4298 19 12 19C12.5718 19 13.0653 18.6162 13.5307 18.2543C13.7195 18.1074 13.9037 17.9642 14.0866 17.8517C14.7945 17.4161 15.7387 17 17 17C18.3898 17 19.5463 17.2318 20.3503 17.4615C20.5227 17.5108 20.7099 17.5898 20.9042 17.6719C21.4443 17.9 22.0393 18.1513 22.5257 17.8507C22.8205 17.6684 23 17.3466 23 17V4ZM3.33252 4.55749C3.13163 4.62161 3 4.81078 3 5.02166V14.8991C3 15.233 3.32089 15.4733 3.64547 15.3951C4.53577 15.1807 5.67777 15 7 15C8.76309 15 10.0794 15.5994 11 16.1721V5.45567C10.7989 5.29593 10.5037 5.08245 10.1289 4.86824C9.35493 4.426 8.27622 4 7 4C5.41509 4 4.12989 4.30297 3.33252 4.55749ZM17 15C15.2369 15 13.9206 15.5994 13 16.1721V5.45567C13.2011 5.29593 13.4963 5.08245 13.8711 4.86824C14.6451 4.426 15.7238 4 17 4C18.5849 4 19.8701 4.30297 20.6675 4.55749C20.8684 4.62161 21 4.81078 21 5.02166V14.8991C21 15.233 20.6791 15.4733 20.3545 15.3951C19.4642 15.1807 18.3222 15 17 15Z" fill="#0F0F0F"/>
+						<path d="M2.08735 20.4087C1.86161 19.9047 2.08723 19.3131 2.59127 19.0873C3.05951 18.8792 3.54426 18.7043 4.0318 18.5478C4.84068 18.2883 5.95911 18 7 18C8.16689 18 9.16285 18.6289 9.88469 19.0847C9.92174 19.1081 9.95807 19.131 9.99366 19.1534C10.8347 19.6821 11.4004 20 12 20C12.5989 20 13.1612 19.6829 14.0012 19.1538C14.0357 19.1321 14.0708 19.1099 14.1066 19.0872C14.8291 18.6303 15.8257 18 17 18C18.0465 18 19.1647 18.2881 19.9732 18.548C20.6992 18.7814 21.2378 19.0122 21.3762 19.073C21.8822 19.2968 22.1443 19.8943 21.9118 20.4105C21.6867 20.9106 21.0859 21.1325 20.5874 20.9109C20.1883 20.7349 19.7761 20.5855 19.361 20.452C18.6142 20.2119 17.7324 20 17 20C16.4409 20 15.9037 20.3186 15.0069 20.8841C14.2635 21.3529 13.2373 22 12 22C10.7619 22 9.73236 21.3521 8.98685 20.8829C8.08824 20.3173 7.55225 20 7 20C6.27378 20 5.39222 20.2117 4.64287 20.4522C4.22538 20.5861 3.80974 20.7351 3.4085 20.9128C2.9045 21.1383 2.31305 20.9127 2.08735 20.4087Z" fill="#0F0F0F"/>
+					</svg>
+					Load example 3
+				</div>
+			</div>
+			<a class="flex flex-row gap-x-2 items-center hover:underline" href="https://github.com/percyqaz/DMS">
+				<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+				View on GitHub
+			</a>
+		</div>
+		<p>This is an esoteric programming language that was built for <a class="text-blue-800 hover:underline" href="https://adventofcode.com/">Advent of Code</a> puzzles</p>
+		<br/>
+		<div class="toggle-cheat-sheet">See command reference</button>
+	</div>
+	<div class="cheat-sheet flex flex-col items-left container mx-auto">
+		<br/>
+		<p>A command consists of an expression, with any number of operators applied to it, for example <code>_&lt;@!-'A</code></p>
+		<br/>
+		<p>Commands are executed in sequence, looping to the top after the last command has run.</p>
+		<p>The resulting value from each command is added to the current cell.</p>
+		<p>Outputting 0 as a char terminates the program.</p>
+		<br/>
+		<p>You can use # to comment out the rest of a line.</p>
+		<br/>
+		<p>There is also a more exact specification <a class="text-blue-800 hover:underline" href="https://github.com/percyqaz/DMS/blob/main/docs/spec.md">here</a></p>
+		
+		<h2 class="text-3xl my-4">Expressions</h2>
+		
+		<table>
+		<thead>
+			<tr><th>Symbol</th><th>Name</th><th>Returns</th></tr>
+		</thead>
+		<tbody>
+		<tr>
+		<td>Any sequence of digits 0-9</td>
+		<td>NUMBER</td>
+		<td>The base-10 interpretation of those digits as an integer i.e. <code>123</code> returns 123</td>
+		</tr>
+		<tr>
+		<td><code>&#39;</code> followed by any character C</td>
+		<td>CHAR</td>
+		<td>The UTF-16 value of the character C as an int, i.e <code>&#39;a</code> returns 97</td>
+		</tr>
+		<tr>
+		<td><code>.</code></td>
+		<td>CELL</td>
+		<td>Value stored in the current cell</td>
+		</tr>
+		<tr>
+		<td><code>%</code></td>
+		<td>COMMAND_POINTER</td>
+		<td>The command pointer</td>
+		</tr>
+		<tr>
+		<td><code>[</code></td>
+		<td>CELL_POSITION_X</td>
+		<td>The X coordinate of the cell pointer</td>
+		</tr>
+		<tr>
+		<td><code>]</code></td>
+		<td>CELL_POSITION_Y</td>
+		<td>The Y coordinate of the cell pointer</td>
+		</tr>
+		</tbody>
+		</table>
+		
+		<h2 class="text-3xl my-4">Operators</h2>
+		<p>Let <strong>I</strong> denote the input to each operator for the descriptions of effects and return values.</p>
+		</br>
+		<table>
+		<thead>
+			<tr><th>Symbol</th><th>Name</th><th>Effect</th><th>Returns</th><th>Notes</th></tr>
+		</thead>
+		<tbody>
+		<tr>
+		<td><code>-</code></td>
+		<td>NEGATE</td>
+		<td>No effect on state</td>
+		<td>-<strong>I</strong></td>
+		<td><code>-123</code> is <code>-</code> applied to <code>123</code>, returning -123</td>
+		</tr>
+		<tr>
+		<td><code>+</code></td>
+		<td>SIGN</td>
+		<td>No effect on state</td>
+		<td>The sign of <strong>I</strong> -- 1 if <strong>I</strong> is positive, -1 if <strong>I</strong> is negative, 0 otherwise</td>
+		<td/>
+		</tr>
+		<tr>
+		<td><code>!</code></td>
+		<td>COMPLEMENT</td>
+		<td>No effect on state</td>
+		<td>1 - <strong>I</strong></td>
+		<td><code>!1</code> returns 0, <code>!0</code> returns 1, <code>!6</code> returns -5</td>
+		</tr>
+		<tr>
+		<td><code>?</code></td>
+		<td>CONDITION</td>
+		<td>No effect on state</td>
+		<td><strong>I</strong> if the current cell value is positive. 0 otherwise</td>
+		<td/>
+		</tr>
+		<tr>
+		<td><code>_</code></td>
+		<td>DISCARD</td>
+		<td>No effect on state</td>
+		<td>Always returns 0, ignoring its input</td>
+		<td>Useful for creating a command that updates the state of the machine but doesn&#39;t write anything to the current cell.</td>
+		</tr>
+		<tr>
+		<td><code>@</code></td>
+		<td>CHAR_OUTPUT</td>
+		<td>Writes <strong>I</strong>, interpreted as a UTF-8 character, to standard output. If <strong>I</strong> is 0, terminates the program instead</td>
+		<td><strong>I</strong> (unchanged)</td>
+		<td>Outputting the NUL char (0) is the only way to terminate a DMS program</td>
+		</tr>
+		<tr>
+		<td><code>*</code></td>
+		<td>INT_OUTPUT</td>
+		<td>Writes <strong>I</strong>, formatted as a base-10 integer, to standard output.</td>
+		<td><strong>I</strong> (unchanged)</td>
+		</tr>
+		<tr>
+		<td><code>:</code></td>
+		<td>JUMP</td>
+		<td>Increases the command pointer by <strong>I</strong></td>
+		<td><strong>I</strong> (unchanged)</td>
+		<td>Jumping past the last command or before the first causes the command pointer to wrap around. Jumping by -1 (<code>:-1</code>) will result in the same command being executed in a loop.</td>
+		</tr>
+		<tr>
+		<td><code>&lt;</code></td>
+		<td>LEFT</td>
+		<td>Decreases cell pointer&#39;s X value by <strong>I</strong></td>
+		<td><strong>I</strong> (unchanged)</td>
+		<td>Cell positions wrap at the edges of the tape</td>
+		</tr>
+		<tr>
+		<td><code>&gt;</code></td>
+		<td>RIGHT</td>
+		<td>Increases cell pointer&#39;s X value by <strong>I</strong></td>
+		<td><strong>I</strong> (unchanged)</td>
+		<td>Cell positions wrap at the edges of the tape</td>
+		</tr>
+		<tr>
+		<td><code>^</code></td>
+		<td>UP</td>
+		<td>Decreases cell pointer&#39;s Y value by <strong>I</strong></td>
+		<td><strong>I</strong> (unchanged)</td>
+		<td>Cell positions wrap at the edges of the tape</td>
+		</tr>
+		<tr>
+		<td><code>v</code></td>
+		<td>DOWN</td>
+		<td>Increases cell pointer&#39;s Y value by <strong>I</strong></td>
+		<td><strong>I</strong> (unchanged)</td>
+		<td>Cell positions wrap at the edges of the tape</td>
+		</tr>
+		<tr>
+		<td><code>/</code></td>
+		<td>PUSH</td>
+		<td>Pushes <strong>I</strong> to the top of the stack</td>
+		<td>The new stack size</td>
+		<td/>
+		</tr>
+		<tr>
+		<td><code>|</code></td>
+		<td>READ</td>
+		<td>No effect on state</td>
+		<td>The value on the stack <strong>I</strong> positions deep. If the stack is empty, returns the current cell value instead</td>
+		<td><code>|0</code> returns the topmost stack element. Stack positions wrap around, so <code>|-1</code> returns the bottom element of the stack.</td>
+		</tr>
+		<tr>
+		<td><code>\</code></td>
+		<td>POP</td>
+		<td>Removes the value on the stack <strong>I</strong> positions deep. If the stack is empty, there is no effect.</td>
+		<td>The removed value. If the stack is empty, returns the current cell value instead</td>
+		<td><code>\0</code> removes and returns the topmost stack element. Stack positions  wrap around, so <code>\-1</code> removes and returns the bottom element of the stack.</td>
+		</tr>
+		<tr>
+		<td><code>;</code></td>
+		<td>DEBUG</td>
+		<td>Writes debug information about the current state to standard output. No other effect on state</td>
+		<td><strong>I</strong> (unchanged)</td>
+		<td/>
+		</tr>
+		</tbody>
+		</table>
+		<br/>
+
+	</div>
+	<div class="container mx-auto flex flex-col gap-y-4 my-4">
+		<div class="flex items-center lg:flex-row flex-col gap-x-4">
+			<div class="flex flex-col w-full lg:w-1/2">
+				<label class="text-gray-700 text-sm">Source code</label>
+				<textarea class="border border-2 border-gray-700 p-2" id="source" rows="20"></textarea>
+			</div>
+			<div class="flex flex-col w-full lg:w-1/2">
+				<label class="text-gray-700 text-sm">Input data</label>
+				<textarea class="border border-2 border-gray-700 p-2" id="data" rows="20"></textarea>
+			</div>
+		</div>
+		<button class="w-full border border-2 border-gray-700 bg-gray-200 p-2" onclick="run()">Run</button>
+		<div class="flex flex-col w-full">
+			<label class="text-gray-700 text-sm">Output</label>
+			<textarea class="border border-2 border-gray-700 p-2" disabled id="output" rows="20">&lt;Click 'Run' to see the output&gt;</textarea>
+		</div>
+	</div>
 </div>
 
+<script>
+var coll = document.getElementsByClassName("toggle-cheat-sheet")[0];
+var content = document.getElementsByClassName("cheat-sheet")[0];
+
+coll.addEventListener("click", function() {
+		this.classList.toggle("active");
+		if (content.style.maxHeight){
+		  content.style.maxHeight = null;
+		} else {
+		  content.style.maxHeight = content.scrollHeight + "px";
+		} 
+	});
+
+</script>
+
 </body>
+
+<footer>
+<div class="px-4 py-1 flex flex-row justify-center">
+	<a class="hover:underline" href="https://github.com/percyqaz">Created by Percyqaz</a>
+</div>
+</footer>
 </html>

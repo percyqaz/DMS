@@ -1,7 +1,8 @@
+# this program outputs whatever is in the input data
 _@.  # print current cell
 _>1  # move to the right 1 
-_:?3 # if at a non-empty cell skip the next 3 lines 
-_/'
-_@\0 # print a linefeed
-_v+<[# move to beginning of next line 😃
-# program loops to top, automatically quits when printing a nul byte
+_:?2 # if at a non-empty cell skip the next 2 instructions
+# next two instructions are: output a line feed, move to beginning of next line
+_@'
+_v+<[
+# 😃 program loops to top, quits when printing a nul byte

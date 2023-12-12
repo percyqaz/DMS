@@ -4,6 +4,9 @@
 - All indices are 0-based
 - All text characters are parsed and output using UTF-8
 
+Note that both the F# and JavaScript implementations are currently not spec-compliant as they use UTF-16 conversions for characters in some cases  
+I will have to figure out if I should just switch to UTF-16 in the spec
+
 ## State the machine stores:
 
 - A 2-dimensional memory tape of some non-zero finite size. Each individual position in the tape represents a **cell** and stores an integer.
@@ -52,21 +55,21 @@ Let **I** denote the input to each operator for the descriptions of effects and 
 | Symbol | Name | Effect | Returns | Notes |
 | ------ | ---- | ------ | ------- | ----- |
 | `-` | NEGATE | No effect on state | -I | `-123` is `-` applied to `123`, returning -123
-| `+` | SIGN | No effect on state | The sign of I -- 1 if  I is positive, -1 if I is negative, 0 otherwise
+| `+` | SIGN | No effect on state | The sign of I -- 1 if I is positive, -1 if I is negative, 0 otherwise
 | `!` | COMPLEMENT | No effect on state | 1 - I | `!1` returns 0, `!0` returns 1, `!6` returns -5
 | `?` | CONDITION | No effect on state | I if the current cell value is positive. 0 otherwise
-| `_` | DISCARD | No effect on state | Always returns 0, ignoring its input | Useful for creating a command that updates the state of the machine but doesn't write anything to the current cell.
-| `@` | CHAR_OUTPUT | Writes I, interpreted as a UTF-8 character, to standard output. If I is 0, terminates the program instead | I (unchanged) | Outputting the NUL char (0) is the only way to terminate a DMS program
-| `*` | INT_OUTPUT | Writes I, formatted as a base-10 integer, to standard output. | I (unchanged)
-| `:` | JUMP | Increases the command pointer by I | I (unchanged) | Jumping past the last command or before the first causes the command pointer to wrap around. Jumping by -1 (`:-1`) will result in the same command being executed in a loop.
+| `_` | DISCARD | No effect on state | Always returns 0, ignoring its input | Useful for creating a command that updates the state of the machine but doesn't write anything to the current cell
+| `@` | CHAR_OUTPUT | Outputs the UTF-8 character with code I. If I is 0, terminates the program instead | I (unchanged) | Outputting the NUL char (0) is the only way to terminate a DMS program
+| `*` | INT_OUTPUT | Outputs I, formatted as a base-10 integer | I (unchanged)
+| `:` | JUMP | Increases the command pointer by I | I (unchanged) | Jumping past the last command or before the first causes the command pointer to wrap around. Jumping by -1 (`:-1`) will result in the same command being executed in a loop
 | `<` | LEFT | Decreases cell pointer's X value by I | I (unchanged) | This moves the current cell left by I. Cell positions wrap at the edges of the tape
 | `>` | RIGHT | Increases cell pointer's X value by I | I (unchanged) | This moves the current cell right by I. Cell positions wrap at the edges of the tape
 | `^` | UP | Decreases cell pointer's Y value by I | I (unchanged) | This moves the current cell up by I. Cell positions wrap at the edges of the tape
 | `v` | DOWN | Increases cell pointer's Y value by I | I (unchanged) | This moves the current cell down by I. Cell positions wrap at the edges of the tape
 | `/` | PUSH | Pushes I to the top of the stack | The new stack size
-| `\|` | READ | No effect on state | Returns the value on the stack I positions deep. If the stack is empty, returns the current cell value instead | `\|0` returns the topmost stack element. Stack positions wrap around, so `\|-1` returns the bottom element of the stack.
-| `\` | POP | Removes the value on the stack I positions deep. If the stack is empty, there is no effect. | Returns the removed value. If the stack is empty, returns the current cell value instead | `\0` removes and returns the topmost stack element. Stack positions  wrap around, so `\-1` removes and returns the bottom element of the stack.
-| `;` | DEBUG | Writes debug information about the current state to standard output. No other effect on state | I (unchanged) | What is output is up to the implementation. F# implementation outputs value of various state variables, the command fragment passed as an argument, and then waits for `Console.ReadLine()` before proceeding
+| `\|` | READ | No effect on state | The value on the stack I positions deep. If the stack is empty, returns the current cell value instead | `\|0` returns the topmost stack element. Stack positions wrap around, so `\|-1` returns the bottom element of the stack
+| `\` | POP | Removes the value on the stack I positions deep. If the stack is empty, there is no effect | The removed value. If the stack is empty, returns the current cell value instead | `\0` removes and returns the topmost stack element. Stack positions  wrap around, so `\-1` removes and returns the bottom element of the stack
+| `;` | DEBUG | Outputs debug information about the current state | I (unchanged) | What is output is up to the implementation. F# implementation outputs value of various state variables, the command fragment passed as an argument, and then waits for `Console.ReadLine()` before proceeding
 
 ## Execution
 

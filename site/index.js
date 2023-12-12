@@ -1,4 +1,6 @@
 const SYMBOLS = "0123456789'.%[]-+!?_@*:<>^v/|\\;";
+const MEMORY_TAPE_SIZE = 1000
+const LOOP_TIMEOUT_MS = 3000
 
 function mod(n, m) {
   return ((n % m) + m) % m;
@@ -177,16 +179,16 @@ function evaluate_command(state, command) {
 			state.cellPointerX = mod(state.cellPointerX + x, state.cells.length);
 			return x;
 		case "UP":
-			var x = evaluate_command(state, command.inner); 
-			state.cellPointerY = mod(state.cellPointerY - x, state.cells[0].length);
-			return x;
+			var y = evaluate_command(state, command.inner); 
+			state.cellPointerY = mod(state.cellPointerY - y, state.cells[0].length);
+			return y;
 		case "DOWN":
-			var x = evaluate_command(state, command.inner); 
-			state.cellPointerY = mod(state.cellPointerY + x, state.cells[0].length);
-			return x;
+			var y = evaluate_command(state, command.inner); 
+			state.cellPointerY = mod(state.cellPointerY + y, state.cells[0].length);
+			return y;
 		case "CONDITION":
 			var x = evaluate_command(state, command.inner);
-			if (state.cells[state.cellPointerX, state.cellPointerY] > 0) {
+			if (state.cells[state.cellPointerX][state.cellPointerY] > 0) {
 				return x;
 			} else {
 				return 0;
@@ -230,11 +232,11 @@ function run() {
 	try {
 		commands = parse(source);
 	} catch (e) {
-		document.getElementById("output").value = e.message;
+		document.getElementById("output").value = "<Syntax error>\n" + e.message;
 		return;
 	}
 	
-	var memory_cells = Array(1000).fill().map(() => Array(1000).fill(0));
+	var memory_cells = Array(MEMORY_TAPE_SIZE).fill().map(() => Array(MEMORY_TAPE_SIZE).fill(0));
 	
 	var state = {
 		stack: [],
@@ -245,16 +247,117 @@ function run() {
 		cells: memory_cells,
 		output: "",
 		exit: commands.length === 0
+	};
+	
+	const data = document.getElementById("data").value;
+	
+	var x = 0;
+	var y = 0;
+	var i = 0;
+	while (i < data.length) {
+		if (data[i] === '\r' && data[i + 1] === '\n') {
+			i++;
+			y++;
+			x = 0;
+		} else if (data[i] === '\n') {
+			y++;
+			x = 0;
+		} else {
+			memory_cells[mod(x, memory_cells.length)][mod(y, memory_cells[0].length)] = data.charCodeAt(i);
+			x++;
+		}
+		i++;
 	}
 	
-	// todo: negative cell positions
-	// todo: initialise the cells
+	var startTime = Date.now();
 	
 	while (!state.exit) {
 		var result = evaluate_command(state, state.commands[state.commandPointer]);
 		state.cells[state.cellPointerX][state.cellPointerY] += result;
 		state.commandPointer = mod(state.commandPointer + 1, state.commands.length);
+		
+		if (Date.now() - startTime > LOOP_TIMEOUT_MS) {
+			state.output += "\n<Program terminated due to running for too long, likely an infinite loop>";
+			break;
+		}
 	}
 	
 	document.getElementById("output").value = state.output;
+}
+
+const SAMPLE_CODE_1 =
+`# this program outputs the input data contents
+_@.  # print current cell
+_>1  # move to the right 1 
+_:?2 # if at a non-empty cell skip the next 2 instructions
+# next two instructions are: output a line feed, move to beginning of next line
+_@'
+_v+<[
+# 😃 program loops to top, quits when printing a nul byte
+`;
+
+function load_example_1() {
+	document.getElementById("source").value = SAMPLE_CODE_1;
+	document.getElementById("data").value = SAMPLE_CODE_1;
+}
+
+window.onload = load_example_1;
+
+const SAMPLE_CODE_2 =
+`# this program solves Advent of Code 2023 puzzle 4, part 1
+# https://adventofcode.com/2023/day/4
+_/1
+
+# find index of :, push it to the stack
+-':_/0\\_:|+._:3':_>1_:-7':/<[
+
+# find index of |, push it to the stack
+-'|_/0\\_:|+._:3'|_>1_:-7'|/<[
+
+_>|1_<1 # start at :
+_>3 # work through numbers left to right
+
+# if number is null (having gone through every card) jump to end to print output
+_:?1_:52
+
+# if we are looking at |, we have checked every number for this card, go next card
+-'|_/1_/0_\\\\_:!|+._:4'|_v1_<[_:-14
+
+# write working position + number to compare to the stack, then go to | to start search
+'|_/[_/._>1_/._<[_>|3_<1
+_>3 # work through numbers left to right
+
+# if number is null we have reached the end of the search on this row, try the next number
+_:?6_<[_>|2_\\0_\\0_\\0_:-28
+
+# compare first digit against number we are searching for
+-|1_/1_/0_\\\\_:|+._:2
+|1_:-15 # no match, go next
+|1_>1-|0_/1_/0_\\\\_:|+._:3 # first digit matches, try second digit
+|0_<1_:-11 # no match, go next
+
+# match found! add 1 to cell left of row if 0, else double it. then go to next number
+|0_<!-[_:?1:1._>!-|2_\\0_\\0_\\0_:-28
+
+# sum scores for each card, output the result
+_/0_<!-[-1_^]_:1-1\\0_/._^[1_:?-6_^1*\\0@0
+`;
+
+const SAMPLE_INPUT_2 =
+`Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
+Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19
+Card 3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1
+Card 4: 41 92 73 84 69 | 59 84 76 51 58  5 54 83
+Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36
+Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
+`
+
+function load_example_2() {
+	document.getElementById("source").value = SAMPLE_CODE_2;
+	document.getElementById("data").value = SAMPLE_INPUT_2;
+}
+
+function load_example_3() {
+	document.getElementById("source").value = "I don't exist yet";
+	document.getElementById("data").value = "I don't exist yet";
 }
