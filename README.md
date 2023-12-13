@@ -17,7 +17,7 @@ Are the simplest building block of commands, representing a single value
 | Symbol | Name | Returns | Notes |
 | ------ | ---- | ------- | ----- |
 | Any sequence of digits 0-9 | NUMBER | The base-10 interpretation of those digits as an integer i.e. `123` returns 123 | Up to implementation what to do if the number is too large for a 32-bit signed int
-| `'` followed by any character C | CHAR | The UTF-8 value of the character C as an int, i.e `'a` returns 97 | Implementations don't perfectly line up with spec
+| `'` followed by any character C | CHAR | The UTF-16 code point of the character C, i.e `'a` returns 97
 | `.` | CELL | Value stored in the current cell
 | `%` | COMMAND_POINTER | The command pointer
 | `[` | CELL_POSITION_X | The X coordinate of the cell pointer |
@@ -34,7 +34,7 @@ Let **I** denote the input to each operator for the descriptions of effects and 
 | `!` | COMPLEMENT | No effect on state | 1 - I | `!1` returns 0, `!0` returns 1, `!6` returns -5
 | `?` | CONDITION | No effect on state | I if the current cell value is positive. 0 otherwise
 | `_` | DISCARD | No effect on state | Always returns 0, ignoring its input | Useful for creating a command that updates the state of the machine but doesn't write anything to the current cell.
-| `@` | CHAR_OUTPUT | Writes I, interpreted as a UTF-8 character, to standard output. If I is 0, terminates the program instead | I (unchanged) | Outputting the NUL char (0) is the only way to terminate a DMS program
+| `@` | CHAR_OUTPUT | Writes I, interpreted as a UTF-16 character, to standard output. If I is 0, terminates the program instead | I (unchanged) | Outputting the NUL char (0) is the only way to terminate a DMS program
 | `*` | INT_OUTPUT | Writes I, formatted as a base-10 integer, to standard output. | I (unchanged)
 | `:` | JUMP | Increases the command pointer by I | I (unchanged) | Jumping past the last command or before the first causes the command pointer to wrap around. Jumping by -1 (`:-1`) will result in the same command being executed in a loop.
 | `<` | LEFT | Decreases cell pointer's X value by I | I (unchanged) | This moves the current cell left by I. Cell positions wrap at the edges of the tape

@@ -2,10 +2,6 @@
 
 - The DMS machine works only with 32-bit signed integers
 - All indices are 0-based
-- All text characters are parsed and output using UTF-8
-
-Note that both the F# and JavaScript implementations are currently not spec-compliant as they use UTF-16 conversions for characters in some cases  
-I will have to figure out if I should just switch to UTF-16 in the spec
 
 ## State the machine stores:
 
@@ -42,7 +38,7 @@ Are the simplest building block of commands, representing a single value
 | Symbol | Name | Returns | Notes |
 | ------ | ---- | ------- | ----- |
 | Any sequence of digits 0-9 | NUMBER | The base-10 interpretation of those digits as an integer i.e. `123` returns 123 | Up to implementation what to do if the number is too large for a 32-bit signed int. F# implementation overflows
-| `'` followed by any character C | CHAR | The UTF-8 value of the character C as an int, i.e `'a` returns 97 | F# implementation is bugged, wrong conversion in certain character ranges
+| `'` followed by any character C | CHAR | The UTF-16 code point of the character C as an integer, i.e `'a` returns 97
 | `.` | CELL | Value stored in the current cell
 | `%` | COMMAND_POINTER | The command pointer
 | `[` | CELL_POSITION_X | The X coordinate of the cell pointer |
@@ -59,7 +55,7 @@ Let **I** denote the input to each operator for the descriptions of effects and 
 | `!` | COMPLEMENT | No effect on state | 1 - I | `!1` returns 0, `!0` returns 1, `!6` returns -5
 | `?` | CONDITION | No effect on state | I if the current cell value is positive. 0 otherwise
 | `_` | DISCARD | No effect on state | Always returns 0, ignoring its input | Useful for creating a command that updates the state of the machine but doesn't write anything to the current cell
-| `@` | CHAR_OUTPUT | Outputs the UTF-8 character with code I. If I is 0, terminates the program instead | I (unchanged) | Outputting the NUL char (0) is the only way to terminate a DMS program
+| `@` | CHAR_OUTPUT | Outputs the UTF-16 character with code point I. If I is 0, terminates the program instead | I (unchanged) | Outputting the NUL char (0) is the only way to terminate a DMS program
 | `*` | INT_OUTPUT | Outputs I, formatted as a base-10 integer | I (unchanged)
 | `:` | JUMP | Increases the command pointer by I | I (unchanged) | Jumping past the last command or before the first causes the command pointer to wrap around. Jumping by -1 (`:-1`) will result in the same command being executed in a loop
 | `<` | LEFT | Decreases cell pointer's X value by I | I (unchanged) | This moves the current cell left by I. Cell positions wrap at the edges of the tape
@@ -95,20 +91,22 @@ The tape must always contain at least 1 cell, it cannot be 0x0.
 
 ### Initialising the tape with file contents
 
-Interpreter implementations should support a method for using UTF-8 encoded text to populate the memory cells.  
+Interpreter implementations should support a method for using text to populate the memory cells.  
 A chosen piece of text should be read line by line - a line ends with CRLF, LF or the end of the text.  
 
-Each line is then inserted as a row of UTF-8 characters, converted to integers, into the tape, starting at (0,0) for the first line of the file, (0,1) for the second, etc.  
+Interpreters should parse the provided text in its appropriate encoding, but each character should become its UTF-16 code point(s) when written to the tape.
+
+Each line is then inserted as a row of UTF-16 code points, into the tape, starting at (0,0) for the first line of the file, (0,1) for the second, etc.  
 
 The trailing CRLF or LF at the end of a line should not be written to the tape. In the case of CRCRLF, it is up to the implementation if *all* trailing CR characters should be stripped, or just the last one
 
 The rest of the tape remains initialised to 0.
 
-Written cell positions should wrap to fit the max size of the tape
+Written cell positions should wrap to fit the max size of the tape.
 
 ## Parsing a DMS program
 
-Parsing should operate character-by-character (in UTF-8 encoding)
+Parsing should operate character-by-character. If the source is a file, the characters should be encoded with UTF-8.
 
 A command character is any character that could be part of a command, obtainable from the tables above: `0123456789'.%[]-+!?_@*:<>^v/|\;`
 
